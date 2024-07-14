@@ -5,11 +5,18 @@
 [sub_resource type="BoxMesh" id="BoxMesh_2s7m2"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_l5lxg"]
+radius = 0.25
+height = 1.0
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_u6k7g"]
+radius = 0.25
+height = 1.0
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_om4m1")
+speed = 4.0
+jump_speed = 5.4
+fall_acceleration = 15.4
 
 [node name="Pivot" type="Node3D" parent="."]
 

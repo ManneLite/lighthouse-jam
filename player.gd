@@ -3,6 +3,9 @@ extends CharacterBody3D
 ## Player speed [m/s]
 @export var speed: float = 14 
 
+## Player jump speed [m/s]
+@export var jump_speed: float = 14
+
 ## Downward acceleration in air [m/s]
 @export var fall_acceleration: float = 75
 
@@ -12,23 +15,30 @@ extends CharacterBody3D
 ## Mouse rotation sensitivity for y axis
 @export var pitch: float = 0.01
 
-@onready var pivot : Node3D= $Pivot
-@onready var camera := $Pivot/Camera3D
+@onready var pivot : Node3D = $Pivot
+@onready var camera : Camera3D = $Pivot/Camera3D
 
 var target_velocity: Vector3 = Vector3.ZERO
 
 func _unhandled_input(event: InputEvent)-> void:
     if event is InputEventMouseButton:
+        print("setting mouse mode: CAPTURED")
         Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
     elif event.is_action_pressed("escape"):
+        print("setting mouse mode: VISIBLE")
         Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
     if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
         if event is InputEventMouseMotion:
             pivot.rotate_y(-event.relative.x * yaw)
             camera.rotate_x(-event.relative.y * pitch)
-            camera.rotation.x = clamp(camera.rotation.x,deg_to_rad(-40),deg_to_rad(60))
+            camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-40), deg_to_rad(60))
             
         
+func _input(event: InputEvent) -> void:
+    if event.is_action_pressed("jump") and is_on_floor():
+        print("jumping")
+        velocity.y = jump_speed
 
 func _physics_process(delta: float) -> void:
     var input_dir := Input.get_vector("move_left","move_right","move_forward","move_back")
@@ -37,11 +47,11 @@ func _physics_process(delta: float) -> void:
         velocity.x = direction.x * speed
         velocity.z = direction.z * speed
     else:
-        velocity.x = move_toward(velocity.x,0,speed)
-        velocity.z = move_toward(velocity.z,0,speed)
+        velocity.x = move_toward(velocity.x, 0, speed)
+        velocity.z = move_toward(velocity.z, 0, speed)
 
 
     if not is_on_floor(): # If in the air, fall towards the floor. Literally gravity
-        target_velocity.y = target_velocity.y - (fall_acceleration * delta)
+        velocity.y = velocity.y - (fall_acceleration * delta)
 
     move_and_slide()
